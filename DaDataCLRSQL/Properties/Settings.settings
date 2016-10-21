@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DaDataCLRSQL.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="dd_token" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">PUT_YOUR_TOKEN_HERE</Value>
+    </Setting>
+    <Setting Name="dd_url" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://suggestions.dadata.ru/suggestions/api/4_1/rs</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
