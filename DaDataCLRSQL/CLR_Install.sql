@@ -67,8 +67,10 @@ END
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetClientInfo] (
+	@token			NVARCHAR(50),
 	@ClientQuery	NVARCHAR(500),
-	@token			NVARCHAR(50))
+	@pType			TINYINT	= NULL,
+	@pStatus		TINYINT	= NULL)
 RETURNS TABLE (
 		orgType NVARCHAR(15),
 		orgStatus NVARCHAR(15),
@@ -97,8 +99,9 @@ AS
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetBankInfo] (
+	@token		NVARCHAR(50),
 	@BankQuery	NVARCHAR(500),
-	@token		NVARCHAR(50))
+	@pStatus	TINYINT	= NULL)
 RETURNS TABLE (
 		name NVARCHAR(150),
 		namePay NVARCHAR(150),
@@ -123,8 +126,11 @@ GO
 
 
 CREATE FUNCTION [dbo].[DaDataGetAddressInfo] (
+	@token		NVARCHAR(50),
 	@AddrrQuery	NVARCHAR(500),
-	@token		NVARCHAR(50))
+	@pLocID		NVARCHAR(3)		= NULL,
+	@pBoundFrom	NVARCHAR(10)	= NULL,
+	@pBoundTo	NVARCHAR(10)	= NULL)
 RETURNS TABLE (
 		addr NVARCHAR(200),
 		postalCode NVARCHAR(10),
@@ -151,8 +157,8 @@ AS
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetEmailInfo] (
-	@EmailQuery	NVARCHAR(500),
-	@token		NVARCHAR(50))
+	@token		NVARCHAR(50),
+	@EmailQuery	NVARCHAR(500))
 RETURNS TABLE (
 		email NVARCHAR(50),
 		local NVARCHAR(30),
@@ -163,8 +169,9 @@ AS
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetNameInfo] (
+	@token		NVARCHAR(50),
 	@NameQuery	NVARCHAR(500),
-	@token		NVARCHAR(50))
+	@pFioPart	TINYINT	= NULL)
 RETURNS TABLE (
 		FullName NVARCHAR(300),
 		Name NVARCHAR(50),
@@ -183,8 +190,8 @@ CREATE FUNCTION [dbo].[Klient_getDaDataInfo] (
 RETURNS TABLE
 AS
 	RETURN (
-	SELECT ddgci.name, ISNULL(ddgci.mnemo, ddgci.name) mnemo, ddgci.nameFull, ISNULL(ddgci.ligDate, ddgci.regDate) StateDate, ddgci.addr, ddgci.inn, ddgci.kpp, ddgci.okpo, ddgci.ogrn, ddgci.region, ddgci.city, tOrgStatus.stDescr OrgStatus
-		FROM dbo.DaDataGetClientInfo(@Query, dbo.DaDataToken()) ddgci
+	SELECT ddgci.name, ISNULL(ddgci.mnemo, ddgci.name) mnemo, ddgci.nameFull, ISNULL(ddgci.ligDate, ddgci.regDate) StateDate, ddgci.addr, ddgci.inn, ddgci.kpp, ddgci.okpo, ddgci.ogrn, ddgci.region, ddgci.city, tOrgStatus.stDescr OrgStatus, ddgci.managName
+		FROM dbo.DaDataGetClientInfo(dbo.DaDataToken(), @Query, @KlType, DEFAULT) ddgci
 			LEFT JOIN (VALUES ('ACTIVE', 'Действующая'),
 			('LIQUIDATING', 'ЛИКВИДИРУЕТСЯ!!!'),
 			('LIQUIDATED', 'ЛИКВИДИРОВАНА!!!')) AS tOrgStatus (OrgStatus, stDescr) ON ddgci.OrgStatus = tOrgStatus.OrgStatus
@@ -200,21 +207,28 @@ SELECT dbo.DaDataCheckToken()
 SELECT dbo.DaDataCheckURL()
 
 SELECT *
-	FROM dbo.DaDataGetClientInfo('7719044994', dbo.DaDataToken()) t
+	FROM dbo.DaDataGetClientInfo(dbo.DaDataToken(), '7719044994', 1, DEFAULT) t
 	ORDER BY city
 
 SELECT *
-	FROM dbo.DaDataGetClientInfo('иванов владислав краснодар', dbo.DaDataToken()) t
+	FROM dbo.DaDataGetClientInfo(dbo.DaDataToken(), 'иванов владислав краснодар', 2, DEFAULT) t
 	ORDER BY city
 
 SELECT *
-	FROM dbo.[DaDataGetBankInfo]('042809679', dbo.DaDataToken()) t
+	FROM dbo.[DaDataGetBankInfo](dbo.DaDataToken(), '042809679', DEFAULT) t
 
 SELECT *
-	FROM dbo.[DaDataGetAddressInfo]('электрозаводская 21 с. 27', dbo.DaDataToken()) t
+	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'электрозаводская 21 с. 27', DEFAULT, DEFAULT ,DEFAULT ) t
 
 SELECT *
-	FROM dbo.[DaDataGetEmailInfo]('dhc@', dbo.DaDataToken()) t
+	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'ново', DEFAULT, 'city','city' ) t 
 
 SELECT *
-	FROM dbo.[DaDataGetNameInfo]('Иванова Илона Петровна', dbo.DaDataToken()) t
+	FROM dbo.[DaDataGetEmailInfo](dbo.DaDataToken(), 'dhc@') t
+
+SELECT *
+	FROM dbo.[DaDataGetNameInfo](dbo.DaDataToken(), 'Иванова Илона Петровна', DEFAULT) t
+
+	
+SELECT *
+	FROM dbo.[DaDataGetNameInfo](dbo.DaDataToken(), 'ал', 1) t

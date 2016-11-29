@@ -40,10 +40,44 @@ namespace SQLCalls
 
         [SqlFunction(FillRowMethodName = "FillKlientRow",
         TableDefinition = "orgType nvarchar(15),orgStatus nvarchar(15), name nvarchar(150), nameFull nvarchar(300), mnemo nvarchar(100),managName nvarchar(100),managPost nvarchar(100),regDate smalldatetime,ligDate smalldatetime,addr nvarchar(200),opf nvarchar(100),inn nvarchar(20),kpp nvarchar(20),ogrn nvarchar(20),okpo nvarchar(20),region nvarchar(100), area nvarchar(100), city nvarchar(100), settle nvarchar(100), capitalMarker nvarchar(3),regkladrid nvarchar(50)")]
-        public static IEnumerable GetClientInfo(SqlString sClientQuery, SqlString sToken)
+        public static IEnumerable GetClientInfo(SqlString sToken, SqlString sClientQuery, SqlByte pType, SqlByte pStatus)
         {
-            var response = DDconnect.SetConnetion(sToken.ToString()).QueryParty(sClientQuery.ToString());
-            return response.suggestionss;
+            var query = new PartySuggestQuery(sClientQuery.ToString());
+
+            if  (!pType.IsNull) {
+                switch ((int) pType)
+                {
+                    case 1:
+                    query.type = PartyType.LEGAL;
+                        break;
+                    case 2:
+                        query.type = PartyType.INDIVIDUAL;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!pStatus.IsNull)
+            {
+                switch ((int)pStatus)
+                {
+                    case 1:
+                        query.status  = new PartyStatus[] { PartyStatus.ACTIVE };
+                        break;
+                    case 2:
+                        query.status = new PartyStatus[] { PartyStatus.LIQUIDATED };
+                        break;
+                    case 3:
+                        query.status = new PartyStatus[] { PartyStatus.LIQUIDATING };
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var response = DDconnect.SetConnetion(sToken.ToString()).QueryParty(query);
+            return response.suggestions;
         }
 
         public static void FillKlientRow(Object obj,
@@ -126,11 +160,31 @@ namespace SQLCalls
         [SqlFunction(FillRowMethodName = "FillBankRow",
         TableDefinition = "name nvarchar(150),namePay nvarchar(150), nameFull nvarchar(300),opf nvarchar(100),bic nvarchar(30),swift nvarchar(30),okpo nvarchar(30), korr nvarchar(30),phone nvarchar(30),addr nvarchar(300),region nvarchar(100),city nvarchar(100),regkladrid nvarchar(100), regDate smalldatetime,ligDate smalldatetime,status nvarchar(30)")]
 
-        public static IEnumerable GetBankInfo(SqlString sBankQuery, SqlString sToken
-            )
+        public static IEnumerable GetBankInfo(SqlString sToken, SqlString sBankQuery, SqlByte pStatus )
         {
-            var response = DDconnect.SetConnetion(sToken.ToString()).QueryBank(sBankQuery.ToString());
-            return response.suggestionss;
+
+            var query = new BankSuggestQuery(sBankQuery.ToString());
+
+            if (!pStatus.IsNull)
+            {
+                switch ((int)pStatus)
+                {
+                    case 1:
+                        query.status = new PartyStatus[] { PartyStatus.ACTIVE };
+                        break;
+                    case 2:
+                        query.status = new PartyStatus[] { PartyStatus.LIQUIDATED };
+                        break;
+                    case 3:
+                        query.status = new PartyStatus[] { PartyStatus.LIQUIDATING };
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var response = DDconnect.SetConnetion(sToken.ToString()).QueryBank(query);
+            return response.suggestions;
         }
 
         public static void FillBankRow(Object obj,
@@ -201,10 +255,25 @@ namespace SQLCalls
         [SqlFunction(FillRowMethodName = "FillAdressRow",
         TableDefinition = "addr nvarchar(200),postalCode nvarchar(10),country nvarchar(50),region nvarchar(100),area nvarchar(100),city nvarchar(100),settle nvarchar(100),street nvarchar(100),house  nvarchar(10), house_type nvarchar(50), block nvarchar(10),block_type nvarchar(50),flat  nvarchar(10),flat_type nvarchar(50),timezone nvarchar(5),capitalMarker nvarchar(5),regkladrid nvarchar(50),fias_level nvarchar(5),kladrid nvarchar(50)")]
 
-        public static IEnumerable GetAdressInfo(SqlString sAdressQuery, SqlString sToken)
+        public static IEnumerable GetAdressInfo(SqlString sToken, SqlString sAdressQuery, SqlString pLocID, SqlString pBoundFrom, SqlString pBoundTo)
         {
-            var response = DDconnect.SetConnetion(sToken.ToString()).QueryAddress(sAdressQuery.ToString());
-            return response.suggestionss;
+            var query = new AddressSuggestQuery(sAdressQuery.ToString());
+
+            if (! pLocID.IsNull )
+                {
+                var location = new AddressData();
+                location.kladr_id = pLocID.ToString();
+                query.locations = new AddressData[] { location };
+                }
+            
+            if (!pBoundFrom.IsNull & !pBoundTo.IsNull )
+                {
+                query.from_bound = new AddressBound(pBoundFrom.ToString ());
+                query.to_bound = new AddressBound(pBoundTo.ToString());
+            }
+            
+            var response = DDconnect.SetConnetion(sToken.ToString()).QueryAddress(query);
+            return response.suggestions;
         }
 
         public static void FillAdressRow(Object obj,
@@ -263,10 +332,10 @@ namespace SQLCalls
         [SqlFunction(FillRowMethodName = "FillEmailRow",
         TableDefinition = "email nvarchar(50),local nvarchar(30),domain nvarchar(20)")]
 
-        public static IEnumerable GetEmailInfo(SqlString sEmailQuery, SqlString sToken)
+        public static IEnumerable GetEmailInfo(SqlString sToken, SqlString sEmailQuery)
         {
             var response = DDconnect.SetConnetion(sToken.ToString()).QueryEmail(sEmailQuery.ToString());
-            return response.suggestionss;
+            return response.suggestions;
         }
 
         public static void FillEmailRow(Object obj,
@@ -292,10 +361,30 @@ namespace SQLCalls
         [SqlFunction(FillRowMethodName = "FillNameRow",
         TableDefinition = "FullName nvarchar(300), Name nvarchar(50), Middlename nvarchar(50), Surname nvarchar(50),  Gender nvarchar(10)")]
 
-        public static IEnumerable GetNameInfo(SqlString sNameQuery, SqlString sToken)
+        public static IEnumerable GetNameInfo(SqlString sToken, SqlString sNameQuery, SqlByte pFioPart)
         {
-            var response = DDconnect.SetConnetion(sToken.ToString()).QueryFio(sNameQuery.ToString());
-            return response.suggestionss;
+            var query = new FioSuggestQuery(sNameQuery.ToString());
+
+            if (!pFioPart.IsNull)
+            {
+                switch ((int)pFioPart)
+                {
+                    case 1:
+                        query.parts = new FioPart[] { FioPart.NAME };
+                        break;
+                    case 2:
+                        query.parts = new FioPart[] { FioPart.PATRONYMIC };
+                        break;
+                    case 3:
+                        query.parts = new FioPart[] { FioPart.SURNAME };
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            var response = DDconnect.SetConnetion(sToken.ToString()).QueryFio(query);
+            return response.suggestions;
         }
 
         public static void FillNameRow(Object obj,
