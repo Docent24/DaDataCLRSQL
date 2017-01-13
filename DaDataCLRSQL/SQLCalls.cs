@@ -253,7 +253,7 @@ namespace SQLCalls
     public class AdressApi
     {
         [SqlFunction(FillRowMethodName = "FillAdressRow",
-        TableDefinition = "addr nvarchar(200),postalCode nvarchar(10),country nvarchar(50),region nvarchar(100),area nvarchar(100),city nvarchar(100),settle nvarchar(100),street nvarchar(100),house  nvarchar(10), house_type nvarchar(50), block nvarchar(10),block_type nvarchar(50),flat  nvarchar(10),flat_type nvarchar(50),timezone nvarchar(5),capitalMarker nvarchar(5),regkladrid nvarchar(50),fias_level nvarchar(5),kladrid nvarchar(50)")]
+        TableDefinition = "addr nvarchar(200),postalCode nvarchar(10),country nvarchar(50),region nvarchar(100),area nvarchar(100),city nvarchar(100),settle nvarchar(100),street nvarchar(100),house  nvarchar(10), house_type nvarchar(50), block nvarchar(10),block_type nvarchar(50),flat  nvarchar(10),flat_type nvarchar(50),timezone nvarchar(5),capitalMarker nvarchar(5),regkladrid nvarchar(50),fias_level nvarchar(5),kladrid nvarchar(50), geo_lat nvarchar(30), geo_lon nvarchar(30), qc_geo nvarchar(1)")]
 
         public static IEnumerable GetAdressInfo(SqlString sToken, SqlString sAdressQuery, SqlString pLocID, SqlString pBoundFrom, SqlString pBoundTo)
         {
@@ -295,7 +295,10 @@ namespace SQLCalls
             out SqlString capitalMarker,
             out SqlString regkladrid,
             out SqlString fias_level,
-            out SqlString kladrid
+            out SqlString kladrid,
+            out SqlString geo_lat,
+            out SqlString geo_lon,
+            out SqlString qc_geo
             )
         {
             SuggestAddressResponse.Suggestions ClInfo = (SuggestAddressResponse.Suggestions)obj;
@@ -321,6 +324,9 @@ namespace SQLCalls
             regkladrid = new SqlString(ClInfo.data.region_kladr_id);
             fias_level = new SqlString(ClInfo.data.fias_level);
             kladrid = new SqlString(ClInfo.data.kladr_id);
+            geo_lat = new SqlString(ClInfo.data.geo_lat);
+            geo_lon = new SqlString(ClInfo.data.geo_lon);
+            qc_geo = new SqlString(ClInfo.data.qc_geo);
 
         }
 

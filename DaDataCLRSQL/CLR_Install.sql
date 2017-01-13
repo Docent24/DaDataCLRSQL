@@ -30,8 +30,8 @@ GO
 DROP FUNCTION [dbo].[DaDataCheckURL]
 GO
 
-DROP FUNCTION dbo.DaDataToken
-GO
+--DROP FUNCTION dbo.DaDataToken
+--GO
 
 
 DROP ASSEMBLY [DaDataCLRSQL]
@@ -57,14 +57,14 @@ AS
 
 GO
 
-CREATE FUNCTION dbo.DaDataToken ()
-RETURNS NVARCHAR(50)
-AS
-BEGIN
-	RETURN 'PUT_YOUR_TOKEN_HERE'
-END
+--CREATE FUNCTION dbo.DaDataToken ()
+--RETURNS NVARCHAR(50)
+--AS
+--BEGIN
+--	RETURN 'PUT_YOUR_TOKEN_HERE'
+--END
 
-GO
+--GO
 
 CREATE FUNCTION [dbo].[DaDataGetClientInfo] (
 	@token			NVARCHAR(50),
@@ -150,7 +150,10 @@ RETURNS TABLE (
 		capitalMarker NVARCHAR(5),
 		regkladrid NVARCHAR(50),
 		fias_level NVARCHAR(5),
-		kladrid NVARCHAR(50)
+		kladrid NVARCHAR(50),
+		geo_lat nvarchar(30), 
+		geo_lon nvarchar(30), 
+		qc_geo nvarchar(1)
 	) WITH EXECUTE AS CALLER
 AS
 	EXTERNAL NAME [DaDataCLRSQL].[SQLCalls.AdressApi].GetAdressInfo
