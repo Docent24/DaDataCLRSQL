@@ -67,21 +67,21 @@ GO
 --GO
 
 CREATE FUNCTION [dbo].[DaDataGetClientInfo] (
-	@token			NVARCHAR(50),
-	@ClientQuery	NVARCHAR(500),
-	@pType			TINYINT	= NULL,
-	@pStatus		TINYINT	= NULL)
+	@token		 NVARCHAR(50),
+	@ClientQuery NVARCHAR(500),
+	@pType		 TINYINT = NULL,
+	@pStatus	 TINYINT = NULL)
 RETURNS TABLE (
 		orgType NVARCHAR(15),
 		orgStatus NVARCHAR(15),
-		name NVARCHAR(150),
-		nameFull NVARCHAR(300),
-		mnemo NVARCHAR(100),
-		managName NVARCHAR(100),
+		name NVARCHAR(500),
+		nameFull NVARCHAR(1000),
+		mnemo NVARCHAR(200),
+		managName NVARCHAR(200),
 		managPost NVARCHAR(100),
 		regDate SMALLDATETIME,
 		ligDate SMALLDATETIME,
-		addr NVARCHAR(200),
+		addr NVARCHAR(500),
 		opf NVARCHAR(100),
 		inn NVARCHAR(20),
 		kpp NVARCHAR(20),
@@ -99,9 +99,9 @@ AS
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetBankInfo] (
-	@token		NVARCHAR(50),
-	@BankQuery	NVARCHAR(500),
-	@pStatus	TINYINT	= NULL)
+	@token	   NVARCHAR(50),
+	@BankQuery NVARCHAR(500),
+	@pStatus   TINYINT = NULL)
 RETURNS TABLE (
 		name NVARCHAR(150),
 		namePay NVARCHAR(150),
@@ -127,33 +127,34 @@ GO
 
 CREATE FUNCTION [dbo].[DaDataGetAddressInfo] (
 	@token		NVARCHAR(50),
-	@AddrrQuery	NVARCHAR(500),
-	@pLocID		NVARCHAR(3)		= NULL,
-	@pBoundFrom	NVARCHAR(10)	= NULL,
-	@pBoundTo	NVARCHAR(10)	= NULL)
+	@AddrrQuery NVARCHAR(500),
+	@pLocID		NVARCHAR(3)	 = NULL,
+	@pBoundFrom NVARCHAR(10) = NULL,
+	@pBoundTo   NVARCHAR(10) = NULL)
 RETURNS TABLE (
-		addr NVARCHAR(200),
+
+		addr NVARCHAR(500),
 		postalCode NVARCHAR(10),
-		country NVARCHAR(50),
-		region NVARCHAR(100),
-		area NVARCHAR(100),
-		city NVARCHAR(100),
-		settle NVARCHAR(100),
-		street NVARCHAR(100),
-		house NVARCHAR(10),
-		house_type NVARCHAR(50),
-		block NVARCHAR(10),
-		block_type NVARCHAR(50),
-		flat NVARCHAR(10),
-		flat_type NVARCHAR(50),
+		country NVARCHAR(100),
+		region NVARCHAR(200),
+		area NVARCHAR(200),
+		city NVARCHAR(200),
+		settle NVARCHAR(200),
+		street NVARCHAR(200),
+		house NVARCHAR(100),
+		house_type NVARCHAR(100),
+		block NVARCHAR(100),
+		block_type NVARCHAR(100),
+		flat NVARCHAR(100),
+		flat_type NVARCHAR(100),
 		timezone NVARCHAR(5),
 		capitalMarker NVARCHAR(5),
 		regkladrid NVARCHAR(50),
 		fias_level NVARCHAR(5),
 		kladrid NVARCHAR(50),
-		geo_lat nvarchar(30), 
-		geo_lon nvarchar(30), 
-		qc_geo nvarchar(1)
+		geo_lat NVARCHAR(30),
+		geo_lon NVARCHAR(30),
+		qc_geo NVARCHAR(1)
 	) WITH EXECUTE AS CALLER
 AS
 	EXTERNAL NAME [DaDataCLRSQL].[SQLCalls.AdressApi].GetAdressInfo
@@ -161,7 +162,7 @@ GO
 
 CREATE FUNCTION [dbo].[DaDataGetEmailInfo] (
 	@token		NVARCHAR(50),
-	@EmailQuery	NVARCHAR(500))
+	@EmailQuery NVARCHAR(500))
 RETURNS TABLE (
 		email NVARCHAR(50),
 		local NVARCHAR(30),
@@ -172,9 +173,9 @@ AS
 GO
 
 CREATE FUNCTION [dbo].[DaDataGetNameInfo] (
-	@token		NVARCHAR(50),
-	@NameQuery	NVARCHAR(500),
-	@pFioPart	TINYINT	= NULL)
+	@token	   NVARCHAR(50),
+	@NameQuery NVARCHAR(500),
+	@pFioPart  TINYINT = NULL)
 RETURNS TABLE (
 		FullName NVARCHAR(300),
 		Name NVARCHAR(50),
@@ -188,13 +189,13 @@ GO
 
 
 CREATE FUNCTION [dbo].[Klient_getDaDataInfo] (
-	@Query	NVARCHAR(500),
-	@KlType	AS TINYINT	= NULL)
+	@Query  NVARCHAR(500),
+	@KlType AS TINYINT = NULL)
 RETURNS TABLE
 AS
-	RETURN (
-	SELECT ddgci.name, ISNULL(ddgci.mnemo, ddgci.name) mnemo, ddgci.nameFull, ISNULL(ddgci.ligDate, ddgci.regDate) StateDate, ddgci.addr, ddgci.inn, ddgci.kpp, ddgci.okpo, ddgci.ogrn, ddgci.region, ddgci.city, tOrgStatus.stDescr OrgStatus, ddgci.managName
-		FROM dbo.DaDataGetClientInfo(dbo.DaDataToken(), @Query, @KlType, DEFAULT) ddgci
+	RETURN
+	(SELECT ddgci.name, ISNULL(ddgci.mnemo, ddgci.name) mnemo, ddgci.nameFull, ISNULL(ddgci.ligDate, ddgci.regDate) StateDate, ddgci.addr, ddgci.inn, ddgci.kpp, ddgci.okpo, ddgci.ogrn, ddgci.region, ddgci.city, tOrgStatus.stDescr OrgStatus, ddgci.managName
+		FROM dbo.DaDataGetClientInfo(dbo.DaDataToken(), @Query + ' ', @KlType, DEFAULT) ddgci
 			LEFT JOIN (VALUES ('ACTIVE', 'Действующая'),
 			('LIQUIDATING', 'ЛИКВИДИРУЕТСЯ!!!'),
 			('LIQUIDATED', 'ЛИКВИДИРОВАНА!!!')) AS tOrgStatus (OrgStatus, stDescr) ON ddgci.OrgStatus = tOrgStatus.OrgStatus
@@ -221,10 +222,10 @@ SELECT *
 	FROM dbo.[DaDataGetBankInfo](dbo.DaDataToken(), '042809679', DEFAULT) t
 
 SELECT *
-	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'электрозаводская 21 с. 27', DEFAULT, DEFAULT ,DEFAULT ) t
+	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'электрозаводская 21 с. 27', DEFAULT, DEFAULT, DEFAULT) t
 
 SELECT *
-	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'ново', DEFAULT, 'city','city' ) t 
+	FROM dbo.[DaDataGetAddressInfo](dbo.DaDataToken(), 'ново', DEFAULT, 'city', 'city') t
 
 SELECT *
 	FROM dbo.[DaDataGetEmailInfo](dbo.DaDataToken(), 'dhc@') t
@@ -232,6 +233,6 @@ SELECT *
 SELECT *
 	FROM dbo.[DaDataGetNameInfo](dbo.DaDataToken(), 'Иванова Илона Петровна', DEFAULT) t
 
-	
+
 SELECT *
 	FROM dbo.[DaDataGetNameInfo](dbo.DaDataToken(), 'ал', 1) t

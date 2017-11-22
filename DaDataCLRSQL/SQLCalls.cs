@@ -39,7 +39,7 @@ namespace SQLCalls
     {
 
         [SqlFunction(FillRowMethodName = "FillKlientRow",
-        TableDefinition = "orgType nvarchar(15),orgStatus nvarchar(15), name nvarchar(150), nameFull nvarchar(300), mnemo nvarchar(100),managName nvarchar(100),managPost nvarchar(100),regDate smalldatetime,ligDate smalldatetime,addr nvarchar(200),opf nvarchar(100),inn nvarchar(20),kpp nvarchar(20),ogrn nvarchar(20),okpo nvarchar(20),region nvarchar(100), area nvarchar(100), city nvarchar(100), settle nvarchar(100), capitalMarker nvarchar(3),regkladrid nvarchar(50)")]
+        TableDefinition = "orgType nvarchar(15),orgStatus nvarchar(15), name nvarchar(500), nameFull nvarchar(1000), mnemo nvarchar(200),managName nvarchar(200),managPost nvarchar(100),regDate smalldatetime,ligDate smalldatetime,addr nvarchar(500),opf nvarchar(100),inn nvarchar(20),kpp nvarchar(20),ogrn nvarchar(20),okpo nvarchar(20),region nvarchar(100), area nvarchar(100), city nvarchar(100), settle nvarchar(100), capitalMarker nvarchar(3),regkladrid nvarchar(50)")]
         public static IEnumerable GetClientInfo(SqlString sToken, SqlString sClientQuery, SqlByte pType, SqlByte pStatus)
         {
             var query = new PartySuggestQuery(sClientQuery.ToString());
@@ -253,7 +253,7 @@ namespace SQLCalls
     public class AdressApi
     {
         [SqlFunction(FillRowMethodName = "FillAdressRow",
-        TableDefinition = "addr nvarchar(200),postalCode nvarchar(10),country nvarchar(50),region nvarchar(100),area nvarchar(100),city nvarchar(100),settle nvarchar(100),street nvarchar(100),house  nvarchar(10), house_type nvarchar(50), block nvarchar(10),block_type nvarchar(50),flat  nvarchar(10),flat_type nvarchar(50),timezone nvarchar(5),capitalMarker nvarchar(5),regkladrid nvarchar(50),fias_level nvarchar(5),kladrid nvarchar(50), geo_lat nvarchar(30), geo_lon nvarchar(30), qc_geo nvarchar(1)")]
+        TableDefinition = "addr nvarchar(500),postalCode nvarchar(10),country nvarchar(100),region nvarchar(200),area nvarchar(200),city nvarchar(200),settle nvarchar(200),street nvarchar(200),house  nvarchar(100), house_type nvarchar(100), block nvarchar(100),block_type nvarchar(100),flat  nvarchar(100),flat_type nvarchar(100),timezone nvarchar(5),capitalMarker nvarchar(5),regkladrid nvarchar(50),fias_level nvarchar(5),kladrid nvarchar(50), geo_lat nvarchar(30), geo_lon nvarchar(30), qc_geo nvarchar(1)")]
 
         public static IEnumerable GetAdressInfo(SqlString sToken, SqlString sAdressQuery, SqlString pLocID, SqlString pBoundFrom, SqlString pBoundTo)
         {
